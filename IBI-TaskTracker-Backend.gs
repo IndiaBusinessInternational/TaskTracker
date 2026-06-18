@@ -101,13 +101,27 @@ function verifyPin(pin) {
   return String(pin) === stored;
 }
 
+function isDateObj(v) { return Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v); }
+function dateToYMD(v, tz) {
+  if (v === '' || v == null) return '';
+  if (isDateObj(v)) return Utilities.formatDate(v, tz, 'yyyy-MM-dd');
+  return String(v).slice(0, 10);
+}
+function dateToISO(v, tz) {
+  if (v === '' || v == null) return null;
+  if (isDateObj(v)) return Utilities.formatDate(v, tz, "yyyy-MM-dd'T'HH:mm:ss");
+  return String(v);
+}
+
 function loadDB() {
   var ss = getSS();
+  var tz = ss.getSpreadsheetTimeZone();
   var tasks = rowsToObjects(ss.getSheetByName('Tasks'), TASK_COLS).map(function (t) {
     t.id = String(t.id);
     t.progress = Number(t.progress) || 0;
-    t.targetDate = t.targetDate ? String(t.targetDate) : '';
-    t.completedDate = t.completedDate ? String(t.completedDate) : null;
+    t.targetDate = dateToYMD(t.targetDate, tz);
+    t.createdDate = dateToISO(t.createdDate, tz) || '';
+    t.completedDate = dateToISO(t.completedDate, tz);
     return t;
   });
   var staff = rowsToObjects(ss.getSheetByName('Staff'), STAFF_COLS).map(function (s) {
@@ -136,12 +150,23 @@ function findRowById(sheet, id) {
   return -1;
 }
 
+function writeTaskRow(sh, r, task) {
+  var row = TASK_COLS.map(function (c) { return task[c] == null ? '' : task[c]; });
+  sh.getRange(r, 1, 1, TASK_COLS.length).setValues([row]);
+  // keep id + all date columns as plain text so Sheets does not re-parse them into date serials
+  ['id', 'targetDate', 'createdDate', 'completedDate'].forEach(function (c) {
+    var col = TASK_COLS.indexOf(c) + 1;
+    var cell = sh.getRange(r, col);
+    cell.setNumberFormat('@');
+    cell.setValue(task[c] == null ? '' : String(task[c]));
+  });
+}
+
 function upsertTask(task) {
   var sh = getSS().getSheetByName('Tasks');
-  var row = TASK_COLS.map(function (c) { return task[c] == null ? '' : task[c]; });
   var r = findRowById(sh, task.id);
-  if (r > 0) sh.getRange(r, 1, 1, TASK_COLS.length).setValues([row]);
-  else sh.appendRow(row);
+  if (r < 0) { sh.appendRow([task.id]); r = sh.getLastRow(); }
+  writeTaskRow(sh, r, task);
 }
 
 function deleteTask(id) {
@@ -183,7 +208,8 @@ function replaceAll(db) {
   t.appendRow(TASK_COLS);
   ['A', 'H', 'I', 'L'].forEach(function (c) { t.getRange(c + '2:' + c + '2000').setNumberFormat('@'); });
   (db.tasks || []).forEach(function (task) {
-    t.appendRow(TASK_COLS.map(function (c) { return task[c] == null ? '' : task[c]; }));
+    t.appendRow([task.id == null ? '' : String(task.id)]);
+    writeTaskRow(t, t.getLastRow(), task);
   });
   // staff
   var s = ss.getSheetByName('Staff');

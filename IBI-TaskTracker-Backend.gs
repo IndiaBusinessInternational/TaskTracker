@@ -34,11 +34,12 @@
  */
 
 var DB_NAME    = 'IBI Task Tracker DB';
+var BACKEND_VERSION = '5.1';
 var API_TOKEN  = '';   // optional shared secret; "" = no check
 
 var TASK_COLS  = ['id','title','description','assignedTo','assignedBy','category',
                   'priority','targetDate','createdDate','status','progress',
-                  'completedDate','staffNotes','ceoFeedback'];
+                  'completedDate','staffNotes','ceoFeedback','session'];
 var STAFF_COLS = ['id','name','role','active'];
 
 /* ---------- spreadsheet bootstrap ---------- */
@@ -113,8 +114,19 @@ function dateToISO(v, tz) {
   return String(v);
 }
 
+function ensureHeaders(ss) {
+  var sh = ss.getSheetByName('Tasks');
+  if (!sh) return;
+  var width = Math.max(sh.getLastColumn(), TASK_COLS.length);
+  var header = sh.getRange(1, 1, 1, width).getValues()[0];
+  var needs = false;
+  for (var i = 0; i < TASK_COLS.length; i++) { if (header[i] !== TASK_COLS[i]) { needs = true; break; } }
+  if (needs) sh.getRange(1, 1, 1, TASK_COLS.length).setValues([TASK_COLS]);
+}
+
 function loadDB() {
   var ss = getSS();
+  ensureHeaders(ss);
   var tz = ss.getSpreadsheetTimeZone();
   var tasks = rowsToObjects(ss.getSheetByName('Tasks'), TASK_COLS).map(function (t) {
     t.id = String(t.id);
@@ -248,8 +260,8 @@ function handle(p) {
   try {
     if (action !== 'load' && action !== 'ping') { lock.waitLock(20000); locked = true; }
     switch (action) {
-      case 'ping':        return json({ ok: true, pong: true });
-      case 'load':        return json({ ok: true, db: loadDB(), sheetUrl: getSS().getUrl() });
+      case 'ping':        return json({ ok: true, pong: true, version: BACKEND_VERSION, cols: TASK_COLS });
+      case 'load':        return json({ ok: true, db: loadDB(), sheetUrl: getSS().getUrl(), backend: { version: BACKEND_VERSION, cols: TASK_COLS } });
       case 'verifyPin':   return json({ ok: true, valid: verifyPin(p.pin) });
       case 'upsertTask':  upsertTask(p.task);            return json({ ok: true });
       case 'deleteTask':  deleteTask(p.id);              return json({ ok: true });

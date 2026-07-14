@@ -1,6 +1,6 @@
 /**
  * ============================================================
- *  IBI Task Target & Completion — Google Sheet Backend
+ *  IBI Task Manager — Google Sheet Backend
  *  iINTELLIGENCEi · India Business International
  *
  *  WHAT THIS DOES

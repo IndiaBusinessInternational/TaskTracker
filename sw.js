@@ -1,5 +1,5 @@
 /* IBI Task Manager — Service Worker */
-const CACHE = "ibi-tasks-v6.8";
+const CACHE = "ibi-tasks-v6.9";
 const CORE = [
   "./",
   "./index.html",
@@ -11,7 +11,11 @@ const CORE = [
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).catch(() => {}));
+  /* cache:"reload" bypasses the HTTP cache — a plain addAll() goes through it, so a
+     version bump can silently precache the PREVIOUS build under the new name. */
+  e.waitUntil(caches.open(CACHE)
+    .then((c) => c.addAll(CORE.map((u) => new Request(u, { cache: "reload" }))))
+    .catch(() => {}));
 });
 
 self.addEventListener("activate", (e) => {

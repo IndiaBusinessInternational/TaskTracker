@@ -69,6 +69,7 @@ function initSheets(ss) {
     staff.appendRow(STAFF_COLS);
     staff.appendRow(['s_aswin', 'S. Aswin', 'Packaging Manager', true]);
     staff.appendRow(['m_ajay', 'M. Ajay', 'Catalogue Manager', true]);
+    staff.appendRow(['a_akash', 'A. Akash', 'Assistant Catalogue Manager', true]);
   }
   var set = ss.getSheetByName('Settings') || ss.insertSheet('Settings');
   if (set.getLastRow() === 0) {

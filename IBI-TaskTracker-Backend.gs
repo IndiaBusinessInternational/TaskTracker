@@ -34,7 +34,7 @@
  */
 
 var DB_NAME    = 'IBI Task Tracker DB';
-var BACKEND_VERSION = '5.1';
+var BACKEND_VERSION = '5.2';
 var API_TOKEN  = '';   // optional shared secret; "" = no check
 
 var TASK_COLS  = ['id','title','description','assignedTo','assignedBy','category',
@@ -149,6 +149,9 @@ function loadDB() {
   return {
     ceoName: settings.ceoName || 'Dr. T. Sasimurugan',
     ceoPinSet: settings.ceoPin ? true : false,
+    // CEO's "My order" sequence for My Targets — JSON array of task ids,
+    // written by the app via setSetting('myOrder', ...)
+    myOrder: settings.myOrder ? String(settings.myOrder) : '',
     staff: staff,
     tasks: tasks
   };
@@ -231,15 +234,20 @@ function replaceAll(db) {
   (db.staff || []).forEach(function (st) {
     s.appendRow(STAFF_COLS.map(function (c) { return st[c] == null ? '' : st[c]; }));
   });
-  // settings — preserve existing PIN unless the client explicitly sends one
-  var existingPin = '';
+  // settings — preserve existing PIN and My-order unless the client explicitly sends them
+  var existingPin = '', existingOrder = '';
   var setData = ss.getSheetByName('Settings').getDataRange().getValues();
-  for (var k = 1; k < setData.length; k++) { if (String(setData[k][0]) === 'ceoPin') existingPin = setData[k][1]; }
+  for (var k = 1; k < setData.length; k++) {
+    if (String(setData[k][0]) === 'ceoPin') existingPin = setData[k][1];
+    if (String(setData[k][0]) === 'myOrder') existingOrder = setData[k][1];
+  }
   var g = ss.getSheetByName('Settings');
   g.clearContents();
   g.appendRow(['key', 'value']);
   g.appendRow(['ceoName', db.ceoName || 'Dr. T. Sasimurugan']);
   g.appendRow(['ceoPin', (db.ceoPin != null ? db.ceoPin : existingPin)]);
+  // db.myOrder arrives as an array from a restored backup; store as JSON text
+  g.appendRow(['myOrder', (db.myOrder != null ? JSON.stringify(db.myOrder) : existingOrder)]);
 }
 
 /* ---------- HTTP entry points ---------- */

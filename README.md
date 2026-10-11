@@ -1,6 +1,9 @@
-# IBI Task Manager — v6.14
+# IBI Task Manager — v6.15
 
 Cloud-synced PWA for India Business International: the CEO sets self-targets, assigns work to staff, and verifies completion. Live at https://task.indiabusinessinternational.online (GitHub Pages, backend on Google Apps Script + Google Sheet).
+
+## v6.15 — Phones edge to edge
+- On phones (640px and below) the page runs edge to edge: no outer margin, full-width cards and task cards with 10px side padding, header 8px, and the page can never grow wider than the screen (`overflow-x: clip`). Tablets and desktop are unchanged; no backend change.
 
 ## v6.14 — My order syncs across devices
 - The CEO's "My order" sequence now syncs through the Google Sheet (Settings row `myOrder`, backend v5.2's `loadDB` returns it; `setSetting` writes always worked).

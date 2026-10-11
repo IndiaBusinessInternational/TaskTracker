@@ -1,5 +1,5 @@
 /* IBI Task Manager — Service Worker */
-const CACHE = "ibi-tasks-v6.15";
+const CACHE = "ibi-tasks-v6.16";
 const CORE = [
   "./",
   "./index.html",

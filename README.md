@@ -1,6 +1,9 @@
-# IBI Task Manager — v6.17
+# IBI Task Manager — v6.18
 
 Cloud-synced PWA for India Business International: the CEO sets self-targets, assigns work to staff, and verifies completion. Live at https://task.indiabusinessinternational.online (GitHub Pages, backend on Google Apps Script + Google Sheet).
+
+## v6.18 — Edge to edge on every screen size
+- No centred 1180 px column on laptops: full-bleed cards with 10 px inner padding at every width; wide screens show the dashboard and settings cards side by side and the task cards in columns.
 
 ## v6.17 — WhatsApp preview + Share button
 - Link preview uses a 1200x630 JPEG banner (`og-banner.jpg`, `image/jpeg`); new "Share this app" button in the header (`ibi-share.js`).

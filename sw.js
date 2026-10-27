@@ -1,12 +1,13 @@
 /* IBI Task Manager — Service Worker */
-const CACHE = "ibi-tasks-v6.16";
+const CACHE = "ibi-tasks-v6.17";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-  "./icon-512-mask.png"
+  "./icon-512-mask.png",
+  "./ibi-share.js"
 ];
 
 self.addEventListener("install", (e) => {

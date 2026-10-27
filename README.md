@@ -1,6 +1,9 @@
-# IBI Task Manager — v6.16
+# IBI Task Manager — v6.17
 
 Cloud-synced PWA for India Business International: the CEO sets self-targets, assigns work to staff, and verifies completion. Live at https://task.indiabusinessinternational.online (GitHub Pages, backend on Google Apps Script + Google Sheet).
+
+## v6.17 — WhatsApp preview + Share button
+- Link preview uses a 1200x630 JPEG banner (`og-banner.jpg`, `image/jpeg`); new "Share this app" button in the header (`ibi-share.js`).
 
 ## v6.16 — Buttons never split mid-word
 - Phone cards use `overflow-wrap: break-word` (not `anywhere`, which is inherited and split button labels); buttons, selects and inputs reset to `normal`.
